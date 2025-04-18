@@ -4,20 +4,34 @@ from dotenv import load_dotenv
 from selenium.webdriver import Chrome
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
-COURSES_TO_DOWNLOAD = ["functional programming", "operating systems"]
+COURSES_TO_DOWNLOAD = ["operating systems"]
 
 ### Load environment variables ###
 load_dotenv()
 usernameStr = os.getenv("CURRENTUSERNAME")
 passwordStr = os.getenv("CURRENTPASSWORD")
 
-### Start the Selenium WebDriver and navigate to the home link ###
-browser = Chrome()
+
+### Start the Selenium WebDriver ###
+download_dir = os.path.abspath("course pdfs")
+
+prefs = {
+    "download.default_directory": download_dir,
+    "download.prompt_for_download": False,
+    "download.directory_upgrade": True,
+    "plugins.always_open_pdf_externally": True 
+}
+options = Options()
+options.add_experimental_option("prefs", prefs)
+browser = Chrome(options=options)
+
+
+### Navigate to the home link ###
 BASE_LINK = "https://asen-jhu.evaluationkit.com/Report/Public/Results?Course=&Instructor=&Search=true"
 browser.get(BASE_LINK)
-
-sleep(3)
+sleep(3) # WAIT: until the base page is loaded
 
 
 ### Login to JHU SSO ###
@@ -49,7 +63,7 @@ def download_course(course_name):
 
     browser.get(link)
 
-    sleep(10) # WAIT: until the course search page is loaded
+    sleep(20) # WAIT: until the course search page is loaded
 
     while True:
         try:
@@ -81,7 +95,7 @@ def download_course(course_name):
 
     for url in URLS:
         browser.get(url)
-        sleep(10) # WAIT: until the pdf is downloaded
+        sleep(4) # WAIT: until the pdf is downloaded
 
 
 sleep(5) # WAIT: until the main page is loaded
@@ -90,9 +104,9 @@ for course in COURSES_TO_DOWNLOAD:
     download_course(course)
 
 
-# TODO
+### TODO ###
 # remove sleeps and instead figure out how to wait properly with condition checks
 # - keep track of number of downloads and only stop once it matches the number of pdfs
-# - utilize 
+# - utilize WebDriverWait
 # error handling - if error, try again
 # move pdf downloads to a custom folder

@@ -55,11 +55,13 @@ sleep(10)
 
 browser.get(LINK)
 
-# TODO SCRAPE THE PAGE
+# TODO SCRAPE THE PAGE FOR THE PDF URLS
 
 # Find all PDF download buttons
 pdf_buttons = browser.find_elements(By.CLASS_NAME, "sr-pdf")
 print(len(pdf_buttons))
+
+# ISSUE: not all buttons are initially visible, and we need to click show more continously
 
 # Create a session for downloading PDFs
 session = requests.Session()
@@ -68,6 +70,7 @@ for cookie in cookies:
     session.cookies.set(cookie['name'], cookie['value'])
 
 # Download each PDF
+URLS = []
 for i, button in enumerate(pdf_buttons, start=1):
     # Get the data attributes
     id0 = button.get_attribute("data-id0")
@@ -83,7 +86,17 @@ for i, button in enumerate(pdf_buttons, start=1):
     # Build the URL
     pdf_url = f"{id0},{id1},{id2},{id3}"
     pdf_url = "https://asen-jhu.evaluationkit.com/Reports/SRPdf.aspx?" + quote(pdf_url, safe="()!.,")
-    print(f"[+] Downloading PDF #{i} from {pdf_url}")
+    URLS.append(pdf_url)
+
+    # browser.get(pdf_url)
+
+for url in URLS:
+    browser.get(url)
+    sleep(10)
+
+    # response = requests.get(pdf_url)
+    # print(response.status_code)
+    # print(response.content)
 
 #     # Download and save
     # pdf_resp = session.get(pdf_url)

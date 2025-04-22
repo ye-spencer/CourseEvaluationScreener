@@ -36,22 +36,17 @@ sleep(3) # WAIT: until the base page is loaded
 
 ### Login to JHU SSO ###
 
-# Wait for and get username field
-WebDriverWait(browser, 5).until(lambda d : d.find_element(By.ID, 'i0116'))
+# Enter Username
+sleep(5) # WAIT: until the username field is loaded
 username = browser.find_element(By.ID, 'i0116')
 username.send_keys(usernameStr)
-
-# Click next button
 nextButton = browser.find_element(By.ID, 'idSIButton9')
 nextButton.click()
 
-# Wait for and get password field
-WebDriverWait(browser, 5).until(lambda d : d.find_element(By.ID, 'i0118'))
+# Enter Password
+sleep(5) # WAIT: until the password field is loaded
 password = browser.find_element(By.ID, 'i0118')
 password.send_keys(passwordStr)
-
-# Click submit button
-WebDriverWait(browser, 5).until(lambda d : d.find_element(By.ID, 'idA_PWD_ForgotPassword'))
 submitButton = browser.find_element(By.ID, "idSIButton9")
 submitButton.click()
 
@@ -60,10 +55,9 @@ submitButton.click()
 def download_course(course_name):
     course_name = course_name.replace(" ", "+")
     link = f"https://asen-jhu.evaluationkit.com/Report/Public/Results?Course={course_name}&Instructor=&Search=true"
-
     browser.get(link)
 
-    sleep(20) # WAIT: until the course search page is loaded
+    sleep(10) # WAIT: until the course search page is loaded
 
     while True:
         try:
@@ -75,23 +69,29 @@ def download_course(course_name):
     print("Clicked show more as many times as possible")
     sleep(10) # WAIT: until the the whole course search page is loaded
 
-    pdf_buttons = []
+    # Track unique PDF buttons using their data attributes
+    unique_pdf_buttons = set()
     pdf_buttons = browser.find_elements(By.CLASS_NAME, "sr-pdf")
-    print(len(pdf_buttons))
     
     # Download each PDF
     URLS = []
-    for i, button in enumerate(pdf_buttons, start=1):
+    for button in pdf_buttons:
         # Get the data attributes
         id0 = button.get_attribute("data-id0")
         id1 = button.get_attribute("data-id1")
         id2 = button.get_attribute("data-id2")
         id3 = button.get_attribute("data-id3")
+        
+        # Create a unique identifier for this PDF
+        pdf_id = f"{id0},{id1},{id2},{id3}"
+        
+        # Only process if we haven't seen this PDF before
+        if pdf_id not in unique_pdf_buttons:
+            unique_pdf_buttons.add(pdf_id)
+            pdf_url = f"https://asen-jhu.evaluationkit.com/Reports/SRPdf.aspx?{pdf_id}"
+            URLS.append(pdf_url)
 
-        # Build the URL directly without unnecessary encoding/decoding
-        pdf_url = f"https://asen-jhu.evaluationkit.com/Reports/SRPdf.aspx?{id0},{id1},{id2},{id3}"
-        URLS.append(pdf_url)
-
+    print(f"Found {len(unique_pdf_buttons)} unique PDFs to download")
 
     for url in URLS:
         browser.get(url)
@@ -109,4 +109,4 @@ for course in COURSES_TO_DOWNLOAD:
 # - keep track of number of downloads and only stop once it matches the number of pdfs
 # - utilize WebDriverWait
 # error handling - if error, try again
-# move pdf downloads to a custom folder
+# - if especially on login

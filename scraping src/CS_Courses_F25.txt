@@ -1,0 +1,29 @@
+Gateway Computing: Java
+Computer Ethics
+The Ethics of Artificial Intelligence & Automation
+Human & Machine Intelligence Alignment
+Intermediate Programming
+Data Structures
+Computer System Fundamentals
+Mathematical Foundations for Computer Science
+Computer Graphics & 3D Game Programming
+Practical Generative AI
+Full-Stack JavaScript
+Databases
+Web Security
+CS Innovation and Entrepreneurship I
+Computer Networks
+Cloud Computing
+Object Oriented Software Engineering
+Compilers & Interpreters
+Functional Programming in Software Engineering
+Theory of Computation
+Intro Algorithms
+Security and Privacy in Computing
+Computational Genomics: Applied Comparative Genomics
+Natural Language Processing
+Introduction to Human Language Technology
+Machine Learning
+Causal Inference
+Intro to Human-Computer Interaction
+Accessible Computing

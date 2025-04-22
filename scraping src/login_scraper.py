@@ -1,3 +1,19 @@
+"""
+login_scraper.py
+
+A script to automatically download course evaluation PDFs from JHU's evaluation system.
+Uses Selenium to automate the login process and PDF downloads for specified courses.
+
+Usage:
+    python login_scraper.py --courses courses.txt
+    
+    where courses.txt contains one course name per line to download evaluations for.
+    
+    Environment variables required:
+    - CURRENTUSERNAME: JHU SSO username
+    - CURRENTPASSWORD: JHU SSO password
+"""
+
 import os 
 from time import sleep
 from dotenv import load_dotenv
@@ -5,8 +21,17 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+import argparse
 
-COURSES_TO_DOWNLOAD = ["operating systems"]
+### Parse command line arguments ###
+parser = argparse.ArgumentParser(description='Download course evaluation PDFs for courses')
+parser.add_argument('--courses', help='File containing courses to download on each line')
+args = parser.parse_args()
+
+### Read courses to download from file ###
+with open(args.courses, "r") as f:
+    COURSES_TO_DOWNLOAD = [line.strip() for line in f.readlines()]
+
 
 ### Load environment variables ###
 load_dotenv()
@@ -37,14 +62,14 @@ sleep(3) # WAIT: until the base page is loaded
 ### Login to JHU SSO ###
 
 # Enter Username
-sleep(5) # WAIT: until the username field is loaded
+sleep(3) # WAIT: until the username field is loaded
 username = browser.find_element(By.ID, 'i0116')
 username.send_keys(usernameStr)
 nextButton = browser.find_element(By.ID, 'idSIButton9')
 nextButton.click()
 
 # Enter Password
-sleep(5) # WAIT: until the password field is loaded
+sleep(3) # WAIT: until the password field is loaded
 password = browser.find_element(By.ID, 'i0118')
 password.send_keys(passwordStr)
 submitButton = browser.find_element(By.ID, "idSIButton9")
@@ -57,7 +82,7 @@ def download_course(course_name):
     link = f"https://asen-jhu.evaluationkit.com/Report/Public/Results?Course={course_name}&Instructor=&Search=true"
     browser.get(link)
 
-    sleep(10) # WAIT: until the course search page is loaded
+    sleep(5) # WAIT: until the course search page is loaded
 
     while True:
         try:
@@ -66,8 +91,7 @@ def download_course(course_name):
             show_more_button.click()
         except:
             break
-    print("Clicked show more as many times as possible")
-    sleep(10) # WAIT: until the the whole course search page is loaded
+    sleep(5) # WAIT: until the the whole course search page is loaded
 
     # Track unique PDF buttons using their data attributes
     unique_pdf_buttons = set()
@@ -110,3 +134,5 @@ for course in COURSES_TO_DOWNLOAD:
 # - utilize WebDriverWait
 # error handling - if error, try again
 # - if especially on login
+# - failed links or just too slow
+# add diagnostics/results of run

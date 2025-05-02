@@ -40,7 +40,7 @@ passwordStr = os.getenv("CURRENTPASSWORD")
 
 
 ### Start the Selenium WebDriver ###
-download_dir = os.path.abspath("course pdfs")
+download_dir = os.path.abspath(f"course pdfs/{args.courses.split('.')[-2]}/")
 
 prefs = {
     "download.default_directory": download_dir,

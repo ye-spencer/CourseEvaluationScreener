@@ -1,0 +1,5 @@
+Computer System Fundamentals
+Parallel Computing for Data Science
+Functional Programming
+Intermediate Programming
+Mathematical Foundations for Computer Science

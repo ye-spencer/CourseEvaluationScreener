@@ -78,12 +78,17 @@ parser = argparse.ArgumentParser(description='Process PDF files in a directory')
 parser.add_argument('directory', type=str, help='Directory containing PDF files to process')
 args = parser.parse_args()
 
+directory_add_path = args.directory.replace(" ", "_").replace("/", "-").replace(".", "")
+if not os.path.exists(f"results/{directory_add_path}"):
+    os.makedirs(f"results/{directory_add_path}")
+
 for filename in os.listdir(args.directory):
     if filename.endswith('.pdf'):
         pdf_path = os.path.join(args.directory, filename)
         try:
             pdf_info = get_info_pdfread(pdf_path)
-            print(json.dumps(pdf_info, indent=4))
+            with open(f"results/{directory_add_path}/{filename}.json", "w") as f:
+                json.dump(pdf_info, f, indent=4)
         except Exception as e:
             print(f"Error processing {filename}: {str(e)}")
 

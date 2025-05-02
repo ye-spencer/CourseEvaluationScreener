@@ -75,7 +75,7 @@ def get_info_pdfread(pdf_path):
 
 
 parser = argparse.ArgumentParser(description='Process PDF files in a directory')
-parser.add_argument('directory', type=str, help='Directory containing PDF files to process')
+parser.add_argument('--directory', type=str, help='Directory containing PDF files to process')
 args = parser.parse_args()
 
 directory_add_path = args.directory.replace(" ", "_").replace("/", "-").replace(".", "")

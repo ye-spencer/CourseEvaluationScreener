@@ -1,12 +1,31 @@
+"""
+post_to_database.py
+
+A script to insert course evaluation data from JSON files into a PostgreSQL database.
+Processes JSON files containing extracted course evaluation data and stores them in a structured database.
+
+Usage:
+    python post_to_database.py --directory <json_directory>
+    
+    where <json_directory> contains JSON files of processed course evaluations to insert into the database.
+    
+    Environment variables required:
+    - NEON_PASSWORD: Database password
+    - NEON_HOST: Database host
+"""
+
 import os
 import json
 from dotenv import load_dotenv
 import psycopg2
 import argparse
+
+### Load environment variables ###
 load_dotenv()
 password = os.getenv("NEON_PASSWORD")
 host = os.getenv("NEON_HOST")
 
+### Connect to the database ###
 conn = psycopg2.connect(
     host=host,
     dbname="neondb",
@@ -16,15 +35,15 @@ conn = psycopg2.connect(
     sslmode="require"
 )
 
-
+### Parse command line arguments ###
 parser = argparse.ArgumentParser(description='Process json files in a directory')
 parser.add_argument('--directory', type=str, help='Directory containing json files to put into the database')
 args = parser.parse_args()
 
 json_dir = args.directory
-
 cursor = conn.cursor()
 
+### Process each JSON file in the directory ###
 for file in os.listdir(json_dir):
     if file.endswith('.json'):
         with open(os.path.join(json_dir, file), "r") as f:

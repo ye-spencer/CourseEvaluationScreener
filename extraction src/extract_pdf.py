@@ -1,3 +1,16 @@
+"""
+extract_pdf.py
+
+A script to extract course evaluation data from PDF files and convert it to JSON format.
+Uses pdfplumber to parse PDFs and extract relevant information about course evaluations.
+
+Usage:
+    python extract_pdf.py --directory <pdf_directory>
+    
+    where <pdf_directory> contains PDF files of course evaluations to process.
+"""
+
+
 import pdfplumber
 import re
 import argparse
@@ -24,19 +37,23 @@ def extract_info(text):
         "Workload Responses": 0,
     }
 
+    # Extract term
     term_match = re.search(r"(\d{4}) (Spring|Fall|Summer)", text)
     if term_match:
         fields["Term"] = f"{term_match.group(2)} {term_match.group(1)}"
 
+    # Extract course number and name
     course_match = re.search(r"Course:\s*((EN|AS)\.\d+\.\d+\.\d+\.\w+)\s*:\s*(.+?)\s*\n", text, re.DOTALL)
     if course_match:
         fields["Course Number"] = course_match.group(1)
         fields["Course Name"] = course_match.group(3)
 
+    # Extract instructor
     instructor_match = re.search(r"Instructor:\s*(.*)", text)
     if instructor_match:
         fields["Instructor"] = instructor_match.group(1).strip()
 
+    ### Extract all rating blocks ###
     blocks_ids = {
         "1 - The overall quality of this course is:" : "Quality",
         "2 - The instructor's teaching effectiveness is:" : "Teaching Effectiveness",
@@ -51,7 +68,7 @@ def extract_info(text):
         has_id = False
         for id, tag in blocks_ids.items():
             if block.strip().startswith(id):
-                if (has_id):
+                if has_id:
                     print(f"Error: Multiple block IDs found in block: {block}")
                     continue
                 match = re.search(r"Response Rate\s+Mean\s+STD\s+Median\s+(\d+/\d+).*?%.*?([0-9]+\.[0-9]+)", block, re.DOTALL)
@@ -63,8 +80,8 @@ def extract_info(text):
                 has_id = True
     return fields
 
+
 def get_info_pdfread(pdf_path):
-    
     with pdfplumber.open(pdf_path) as pdf:
         full_text = ""
         for page in pdf.pages:
@@ -74,14 +91,17 @@ def get_info_pdfread(pdf_path):
     return extract_info(full_text)
 
 
+### Parse command line arguments ###
 parser = argparse.ArgumentParser(description='Process PDF files in a directory')
 parser.add_argument('--directory', type=str, help='Directory containing PDF files to process')
 args = parser.parse_args()
 
+### Create results directory if it doesn't exist ###
 directory_add_path = args.directory.replace(" ", "_").replace("/", "-").replace(".", "")
 if not os.path.exists(f"results/{directory_add_path}"):
     os.makedirs(f"results/{directory_add_path}")
 
+### Process each PDF file in the directory ###
 for filename in os.listdir(args.directory):
     if filename.endswith('.pdf'):
         pdf_path = os.path.join(args.directory, filename)

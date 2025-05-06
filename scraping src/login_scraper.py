@@ -5,13 +5,13 @@ A script to automatically download course evaluation PDFs from JHU's evaluation 
 Uses Selenium to automate the login process and PDF downloads for specified courses.
 
 Usage:
-    python login_scraper.py --courses courses.txt
+    python login_scraper.py --courses <filename.txt>
     
-    where courses.txt contains one course name per line to download evaluations for.
+    where <filename.txt> contains one course name per line to download evaluations for.
     
     Environment variables required:
-    - CURRENTUSERNAME: JHU SSO username
-    - CURRENTPASSWORD: JHU SSO password
+    - CURRENTJHUSSOUSERNAME: JHU SSO username
+    - CURRENTJHUSSOPASSWORD: JHU SSO password
 """
 
 import os 
@@ -35,8 +35,8 @@ with open(args.courses, "r") as f:
 
 ### Load environment variables ###
 load_dotenv()
-usernameStr = os.getenv("CURRENTUSERNAME")
-passwordStr = os.getenv("CURRENTPASSWORD")
+usernameStr = os.getenv("CURRENTJHUSSOUSERNAME")
+passwordStr = os.getenv("CURRENTJHUSSOPASSWORD")
 
 
 ### Start the Selenium WebDriver ###

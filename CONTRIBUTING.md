@@ -6,7 +6,7 @@ Hi, and thank you for your interest in contributing to the course evaluation scr
 
 We're currently running this project asynchronously, where anyone can work on anything, and changes will be applied to the main branch through pull requests.
 
-Our main goal right now is to develop a robust API to provide various metrics based on the data we collect from the university though the course evaluations.
+Our main goal right now is to develop a robust API to provide various metrics (for example, the difficulty of a course) based on the data we collect from the university though the course evaluations.
 
 If you have any questions, feel free to email us at <jhuacmofficers@gmail.com>
 
@@ -22,8 +22,24 @@ In addition, we have only collected the data for one course, EN.601.464 Computer
 
 ### The API
 
-The backend api is far from complete. It currently uses Next.js and the my-app/src/app/api/route routing. Since this will be our only interface to semester.ly (as well as a possible future custom frontend), it has to be quite good.
+The backend api is far from complete. As a matter of fact, it is barebones right now. There is only structure. It currently uses Next.js and the my-app/src/app/api/route routing. Since this will be our only interface to semester.ly (as well as a possible future custom frontend), our plan is to make it quite good, and provide info. 
 
-We currently need to increase the number of API calls we support, as well improve error handling, among other things.
+The API should get data from the database (eventually a precomputed version, )
 
-##
+The database being used currently is a PostGres 17. In order to work with the database, you'll need the Environmental Variables
+
+We currently need to increase the number of API calls we support (use your imagination to see what you would like to see), as well improve error handling, among other things.
+
+### Future Proofing this Project
+
+The previous version of this project died due to lack of maintainability and loss of interest because it was not automated. We hope to be able to solve this problem after a basic verison of this project is developed.
+
+## Setup
+
+As far as I know, the only real setup is to create a .env file. There are four necessary variables, please email the officers for them.
+
+CURRENTJHUSSOUSERNAME = 'VALID_JHU_EMAIL'
+CURRENTJHUSSOPASSWORD = 'VALID_JHU_PASSWORD'
+
+NEON_PASSWORD = 'PASSWORD'
+NEON_HOST = 'HOSTNAME'

@@ -35,6 +35,8 @@ def extract_info(text):
         "Feedback Usefulness Responses": 0,
         "Workload Mean": None,
         "Workload Responses": 0,
+        #"Responsiveness": 0,
+        #"Course Organization": 0
     }
 
     # Extract term

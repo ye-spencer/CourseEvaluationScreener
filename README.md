@@ -10,32 +10,6 @@ This project scrapes and analyzes course evaluation data from Johns Hopkins Univ
 - Tianji L.
 - Johnny S.
 
-## Known Issues
-
-### Course Name Subsets
-
-Some courses have names that are subsets of each other (e.g., "Operating Systems" and "Advanced Operating Systems"). When downloading data for "Operating Systems," the system also downloads data for "Advanced Operating Systems."
-
-## Roadmap
-
-### Data Collection Expansion
-
-Currently, data collection is limited to manually collected courses from the Computer Science department. Future development will expand to all departments.
-
-### API Development
-
-Data is currently stored in the database without a presentation layer. Development of an API/backend is planned to analyze and present the data.
-
-## Proposed Enhancements
-
-### Course Search by Number
-
-Since classes have had variable course numbers and course names, we should group by course number instead of course name, as course numbers are the Registrar's primary method of differentiating classes.
-
-### Schedule Comparison Tool
-
-Implement functionality to compare two schedules based on difficulty, workload, and other metrics.
-
 ## Usage Guide
 
 This guide walks you through the process of converting a class list to database-stored data.

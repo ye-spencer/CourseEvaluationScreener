@@ -140,5 +140,7 @@ for filename in os.listdir(args.directory):
 # Get results by PDFRead
 # Get result by PDFScan
 # Get result by trained transformer
+# Third-Party AI APIs? -> cost-prohibitive 
+# Other check results
 # Other check results
 # Use extract info and other online information to generate ai course summary

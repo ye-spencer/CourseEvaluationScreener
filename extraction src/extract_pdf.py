@@ -119,3 +119,4 @@ for filename in os.listdir(args.directory):
 # Get result by PDFScan
 # Get result by trained transformer
 # Other check results
+# Use extract info and other online information to generate ai course summary

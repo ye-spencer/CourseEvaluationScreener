@@ -35,6 +35,8 @@ def extract_info(text):
         "Feedback Usefulness Responses": 0,
         "Workload Mean": None,
         "Workload Responses": 0,
+        #"Course Organization": 0,
+        #"Responsiveness": 0
     }
 
     # Extract term
@@ -80,6 +82,26 @@ def extract_info(text):
                 has_id = True
     return fields
 
+def ai_info(fields: dict):
+    '''
+    After importing ML/AI libraries (e.g. scikit-learn, TensorFlow/Keras),
+    Extrapolate more data from fields data (returned from extract_info function).
+    This can include predicted ratings, sentiment analysis (NLP), outlier identification, clustering based on feedback, etc.
+    '''
+    pass
+
+def basic_analysis(fields: dict):
+    '''
+    Statistical analysis and data visualization of returned fields using data visualization libraries (e.g. Seaborn, matplotlib)
+    '''
+    pass
+
+def ai_analysis(ai_fields: dict):
+    '''
+    Accept ai_info function output, import data visualization libraries (e.g. Seaborn, matplotlib),
+    Return analyzed AI info data in a structured way (may be able to get more metrics)
+    '''
+    pass
 
 def get_info_pdfread(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:

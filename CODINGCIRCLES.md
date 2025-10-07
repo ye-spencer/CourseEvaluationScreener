@@ -19,3 +19,5 @@ If time, have people start working on specific parts, by adding the relevant iss
 ## Week 2
 
 Start with a standup
+
+Teach Rebasing

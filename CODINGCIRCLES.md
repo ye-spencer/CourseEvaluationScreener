@@ -6,6 +6,11 @@ We will be working exclusively in this monorepo. Any new ideas or todos will be 
 
 ## Week 1
 
+Lecture:
+
+1. Project Overview
+2. GitHub Workflow
+
 Goals:
 
 - Everyone create an issue for an idea for something they thing is missing (yes, there is a lot, and yes, technically everything is covered)
@@ -18,6 +23,11 @@ If time, have people start working on specific parts, by adding the relevant iss
 
 ## Week 2
 
-Start with a standup
+Lecture:
 
-Teach Rebasing
+1. Project Component Interfaces
+2. Rebasing
+
+Goals:
+
+- Everyone has an idea of what they want to work on, and a corresponding assigned issue

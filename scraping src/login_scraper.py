@@ -15,85 +15,68 @@ Usage:
 """
 
 import os 
-from time import sleep
+import time
+import glob
 from dotenv import load_dotenv
 from selenium.webdriver import Chrome
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import argparse
 
-DOWNLOAD_DIRECTORY = None
+def wait_for_downloads(download_dir: str, expected_count: int, timeout: int = 180) -> bool:
+    """
+    Wait until all evaluation report PDFs are downloaded
 
-### Parse command line arguments ###
-parser = argparse.ArgumentParser(description='Download course evaluation PDFs for courses')
-parser.add_argument('--courses', help='File containing courses to download on each line')
-args = parser.parse_args()
-
-### Read courses to download from file ###
-with open(args.courses, "r") as f:
-    COURSES_TO_DOWNLOAD = [line.strip() for line in f.readlines()]
-
-
-### Load environment variables ###
-load_dotenv()
-usernameStr = os.getenv("CURRENTJHUSSOUSERNAME")
-passwordStr = os.getenv("CURRENTJHUSSOPASSWORD")
-
-
-### Start the Selenium WebDriver ###
-download_dir = os.path.abspath(f"course pdfs/{args.courses.split('.')[-2]}/")
-
-prefs = {
-    "download.default_directory": download_dir,
-    "download.prompt_for_download": False,
-    "download.directory_upgrade": True,
-    "plugins.always_open_pdf_externally": True 
-}
-options = Options()
-options.add_experimental_option("prefs", prefs)
-browser = Chrome(options=options)
+    Args:
+        download_dir (str): Directory to store downloaded PDFs
+        expected_count (str): # of expected PDFs
+        timeout (int): Maximum time to wait until download completes
+    """
+    os.makedirs(download_dir, exist_ok=True)
+    start = time.time()
+    while time.time() - start < timeout:
+        tmp = glob.glob(os.path.join(download_dir, "*.crdownload"))
+        pdfs = glob.glob(os.path.join(download_dir, "*.pdf"))
+        if not tmp and len(pdfs) >= expected_count:
+            return True
+        time.sleep(1)
+    return False
 
 
-### Navigate to the home link ###
-BASE_LINK = "https://asen-jhu.evaluationkit.com/Report/Public/Results?Course=&Instructor=&Search=true"
-browser.get(BASE_LINK)
-sleep(3) # WAIT: until the base page is loaded
+def expand_all_results(wait: WebDriverWait):
+    """
+    Use WebDriverWait to keep click show more button until no more button shows up
 
-
-### Login to JHU SSO ###
-
-# Enter Username
-sleep(3) # WAIT: until the username field is loaded
-username = browser.find_element(By.ID, 'i0116')
-username.send_keys(usernameStr)
-nextButton = browser.find_element(By.ID, 'idSIButton9')
-nextButton.click()
-
-# Enter Password
-sleep(3) # WAIT: until the password field is loaded
-password = browser.find_element(By.ID, 'i0118')
-password.send_keys(passwordStr)
-submitButton = browser.find_element(By.ID, "idSIButton9")
-submitButton.click()
-
-
-### Download PDFs for a given course ###
-def download_course(course_name):
-    course_name = course_name.replace(" ", "+")
-    link = f"https://asen-jhu.evaluationkit.com/Report/Public/Results?Course={course_name}&Instructor=&Search=true"
-    browser.get(link)
-
-    sleep(5) # WAIT: until the course search page is loaded
-
+    Args:
+        wait (WebDriverWait): WebDriverWait instance
+    """
     while True:
         try:
-            WebDriverWait(browser, 5).until(lambda d : d.find_element(By.ID, 'publicMore')) # WAIT: until the show more button is loaded
-            show_more_button = browser.find_element(By.ID, 'publicMore')
-            show_more_button.click()
-        except:
+            curr = len(browser.find_elements(By.CLASS_NAME, "sr-pdf")) # current number of PDF button
+            btn = wait.until(EC.element_to_be_clickable((By.ID, "publicMore"))) # WAIT: until PDF button is clickable
+            btn.click()
+            WebDriverWait(browser, 10).until( lambda d: len(d.find_elements(By.CLASS_NAME, "sr-pdf")) > curr ) # WAIT: until pdf button increases (max wait: 10 seconds)
+        except :
             break
-    sleep(5) # WAIT: until the the whole course search page is loaded
+
+def download_course(course_name: str) -> None:
+    """
+    Download all evaluation report PDFs for a given JHU course.
+
+    Args:
+        course_name (str): The exact course name (e.g., "Computer Vision")
+        Spaces are automatically replaced with '+' to fit URL encoding.
+    """
+    course_name = course_name.replace(" ", "+")  # replace space with +, allowing encoding into URL
+    link = f"https://asen-jhu.evaluationkit.com/Report/Public/Results?Course={course_name}&Instructor=&Search=true"
+    browser.get(link)
+    wait.until(lambda d: d.execute_script("return document.readyState") == "complete")      # WAIT: until login page is loaded
+
+    ### Load all pages of search result ###
+    expand_all_results(wait)
+    wait.until(lambda d: d.execute_script("return document.readyState") == "complete")      # WAIT: until all search page is loaded
 
     # Track unique PDF buttons using their data attributes
     unique_pdf_buttons = set()
@@ -121,10 +104,65 @@ def download_course(course_name):
 
     for url in URLS:
         browser.get(url)
-        sleep(4) # WAIT: until the pdf is downloaded
+        wait.until(lambda d: d.execute_script("return document.readyState") == "complete") # WAIT: until the pdf is loaded
+
+    ### Check whether download is successfully done ###
+    done = wait_for_downloads(download_dir, expected_count=len(URLS), timeout=180)
+    print(f"[{course_name}] downloads {'DONE' if done else 'TIMEOUT'}")
+
+##### MAIN CODE #####
+DOWNLOAD_DIRECTORY = None
+
+### Parse command line arguments ###
+parser = argparse.ArgumentParser(description='Download course evaluation PDFs for courses')
+parser.add_argument('--courses', help='File containing courses to download on each line')
+args = parser.parse_args()
+if not args.courses or not os.path.exists(args.courses):
+    raise FileNotFoundError(f"--courses not found: {args.courses}") # raise error if courses argument is invalid
+
+### Read courses to download from file ###
+with open(args.courses, "r") as f:
+    COURSES_TO_DOWNLOAD = [line.strip() for line in f.readlines()]
+
+### Load environment variables ###
+load_dotenv()
+usernameStr = os.getenv("CURRENTJHUSSOUSERNAME")
+passwordStr = os.getenv("CURRENTJHUSSOPASSWORD")
+if not usernameStr or not passwordStr:
+    raise EnvironmentError("CURRENTJHUSSOUSERNAME/CURRENTJHUSSOPASSWORD is empty") # raise error if env is empty
 
 
-sleep(5) # WAIT: until the main page is loaded
+### Start the Selenium WebDriver ###
+download_dir = os.path.abspath(f"course pdfs/{args.courses.split('.')[-2]}/") # set directory for downloaded pdfs
+
+### Setting Chrome Download Options ###
+prefs = {
+    "download.default_directory": download_dir,  # setting download directory
+    "download.prompt_for_download": False,       # automate the download without asking
+    "download.directory_upgrade": True,          # give access to chrome to modify download directory
+    "plugins.always_open_pdf_externally": True   # disallow opening pdf with internal viewer
+}
+options = Options()
+options.add_experimental_option("prefs", prefs)  
+browser = Chrome(options=options)                # applying prefs to Chrome
+wait = WebDriverWait(browser, timeout=20)        # WebDriverWait instance for waiting 20 seconds max until given condition is met
+
+### Navigate to the home link ###
+BASE_LINK = "https://asen-jhu.evaluationkit.com/Report/Public/Results?Course=&Instructor=&Search=true"
+browser.get(BASE_LINK)
+wait.until(lambda d: d.execute_script("return document.readyState") == "complete")        # WAIT: until webpage is loaded
+                                                                                          # by executing JS script, check readyState == complete
+
+### Login to JHU SSO ###
+# Enter Username
+wait.until(EC.visibility_of_element_located((By.ID, "i0116"))).send_keys(usernameStr)     # WAIT: until ID page is visible
+wait.until(EC.element_to_be_clickable((By.ID, "idSIButton9"))).click()                    # WAIT: until ID button is clickable
+
+# Enter Password
+wait.until(EC.visibility_of_element_located((By.ID, "i0118"))).send_keys(passwordStr)     # WAIT: until password page is visible
+wait.until(EC.element_to_be_clickable((By.ID, "idSIButton9"))).click()                    # WAIT: until password button is clickable
+
+wait.until(lambda d: d.execute_script("return document.readyState") == "complete")        # WAIT: until the main page is loaded
 ### Download PDFs for each course ###
 for course in COURSES_TO_DOWNLOAD:
     download_course(course)
@@ -138,3 +176,5 @@ for course in COURSES_TO_DOWNLOAD:
 # - if especially on login
 # - failed links or just too slow
 # add diagnostics/results of run
+
+

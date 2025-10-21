@@ -69,7 +69,7 @@ def download_course(course_name: str) -> None:
         course_name (str): The exact course name (e.g., "Computer Vision")
         Spaces are automatically replaced with '+' to fit URL encoding.
     """
-    course_name = course_name.replace(" ", "+")  # replace space with +, allowing encoding into URL
+    course_name_origin = course_name.replace(" ", "+")  # replace space with +, allowing encoding into URL
     link = f"https://asen-jhu.evaluationkit.com/Report/Public/Results?Course={course_name}&Instructor=&Search=true"
     browser.get(link)
     wait.until(lambda d: d.execute_script("return document.readyState") == "complete")      # WAIT: until login page is loaded
@@ -85,6 +85,13 @@ def download_course(course_name: str) -> None:
     # Download each PDF
     URLS = []
     for button in pdf_buttons:
+        # check whether pdf aligns with target course name
+        container = button.find_element(By.XPATH, ".//ancestor::div[contains(@class,'row')][1]")
+        h2 = container.find_element(By.CSS_SELECTOR, "div.sr-dataitem-info h2")
+        txt = h2.text.strip()
+        # pass pdf button if title does not match to target course name
+        if (txt != course_name_origin):
+            continue
         # Get the data attributes
         id0 = button.get_attribute("data-id0")
         id1 = button.get_attribute("data-id1")
@@ -108,7 +115,7 @@ def download_course(course_name: str) -> None:
 
     ### Check whether download is successfully done ###
     done = wait_for_downloads(download_dir, expected_count=len(URLS), timeout=180)
-    print(f"[{course_name}] downloads {'DONE' if done else 'TIMEOUT'}")
+    print(f"[{course_name_origin}] downloads {'DONE' if done else 'TIMEOUT'}")
 
 ##### MAIN CODE #####
 DOWNLOAD_DIRECTORY = None

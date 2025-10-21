@@ -9,7 +9,7 @@ This project scrapes and analyzes course evaluation data from Johns Hopkins Univ
 - Spencer Y.
 - Tianji L.
 - Johnny S.
-
+- Seth W.
 ## Usage Guide
 
 This guide walks you through the process of converting a class list to database-stored data.

@@ -12,7 +12,7 @@ This project scrapes and analyzes course evaluation data from Johns Hopkins Univ
 - Seth W.
 ## Usage Guide
 
-This guide walks you through the process of converting a class list to database-stored data.
+This guide walks you through the process of converting a class list to database stored data.
 
 ### Step 1: Download PDFs
 

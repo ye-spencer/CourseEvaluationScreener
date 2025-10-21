@@ -2,14 +2,14 @@
 
 ## Overview
 
-This project scrapes and analyzes course evaluation data from Johns Hopkins University. It downloads evaluation data for specified courses, processes the JSON files, and stores the results in a PostgreSQL database for further analysis. The data includes metrics such as teaching effectiveness, course quality, workload, and other student feedback metrics.
+This project scrapes and analyzes course evaluation data from Johns Hopkins University. It downloads evaluation data for specified courses, processes the JSON files and stores the results in a PostgreSQL database for further analysis. The data includes metrics such as teaching effectiveness, course quality, workload, and other student feedback metrics.
 
 ## Contributors
 
 - Spencer Y.
 - Tianji L.
 - Johnny S.
-
+- Seth W.
 ## Usage Guide
 
 This guide walks you through the process of converting a class list to database-stored data.

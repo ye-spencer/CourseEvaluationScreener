@@ -22,18 +22,10 @@ import argparse
 
 ### Load environment variables ###
 load_dotenv()
-password = os.getenv("NEON_PASSWORD")
-host = os.getenv("NEON_HOST")
+postgres_url = os.getenv("NEON_CONNECTION")
 
 ### Connect to the database ###
-conn = psycopg2.connect(
-    host=host,
-    dbname="neondb",
-    user="neondb_owner",
-    password=password,
-    port="5432",
-    sslmode="require"
-)
+conn = psycopg2.connect(postgres_url)
 
 ### Parse command line arguments ###
 parser = argparse.ArgumentParser(description='Process json files in a directory')

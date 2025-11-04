@@ -35,6 +35,31 @@ args = parser.parse_args()
 json_dir = args.directory
 cursor = conn.cursor()
 
+### Create the table if it doesn't exist ###
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS "cs-trial-courses-course_evaluations-test" (
+        term TEXT,
+        course_number TEXT,
+        course_name TEXT,
+        instructor TEXT,
+        quality_mean FLOAT,
+        teaching_effectiveness_mean FLOAT,
+        intellectual_challenge_mean FLOAT,
+        ta_evaluation_mean FLOAT,
+        feedback_usefulness_mean FLOAT,
+        workload_mean FLOAT,
+        quality_responses INT,
+        teaching_effectiveness_responses INT,
+        intellectual_challenge_responses INT,
+        ta_evaluation_responses INT,
+        feedback_usefulness_responses INT,
+        workload_responses INT  
+    )
+""")
+
+conn.commit()
+print("Table created successfully")
+
 ### Process each JSON file in the directory ###
 for file in os.listdir(json_dir):
     if file.endswith('.json'):
@@ -43,7 +68,7 @@ for file in os.listdir(json_dir):
             try:
                 values = list(data.values())
                 to_insert = values[0:4] + [float(x) for x in values[4::2]] + [int(x) for x in values[5::2]]
-                cursor.execute("""INSERT INTO "cs-trial-courses"."course_evaluations" (
+                cursor.execute("""INSERT INTO "cs-trial-courses-course_evaluations-test" (
                     term, course_number, course_name, instructor,
                     quality_mean, teaching_effectiveness_mean, intellectual_challenge_mean, 
                     ta_evaluation_mean, feedback_usefulness_mean, workload_mean,
